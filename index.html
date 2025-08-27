@@ -181,7 +181,7 @@
 
   <footer>
     <p>Compartilhe este link para jogar: <span id="link"></span></p>
-    <p style="margin-top:10px;color:#666;">Este site foi criado por um aluno da Faculdade FAMEAC para fins didáticos na disciplina "Saúde da Mulher".</p>
+    <p style="margin-top:10px;color:#666;">Este site foi criado para fins didáticos na disciplina "Saúde da Mulher".</p>
   </footer>
 
   <script>
@@ -193,8 +193,8 @@
     ];
     
     const luckyPhrases = [
-        "Deu sorte! Sem perguntas por aqui",
-        "Deu sorte! Sem perguntas por aqui"
+        " 🦴Deu sorte! Seu grupo pode te ajudar a responder a próxima",
+        " 🦴Deu sorte! Sem perguntas por aqui"
     ];
 
     const boardSize = 5;
@@ -250,7 +250,7 @@
       if (bombs.includes(index)) {
         cell.classList.add("bomb");
         cell.textContent = "💣";
-        showQuestion("Explodiu! Você encontrou uma bomba! Hora de uma nova rodada.");
+        showQuestion("Explodiu! Você encontrou uma bomba! Repasse a vez para um amigo.");
         gameActive = false;
         return;
       }

@@ -186,10 +186,10 @@
 
   <script>
     const allQuestions = [
-      "Por que a queda dos níveis de estrogênio pode favorecer infecções urinárias recorrentes em mulheres na pós-menopausa?",
-      "Quais alterações são causadas na visão pela queda dos níveis de estrogênio na menopausa?",
-      "De que forma o estrogênio atua na manutenção da densidade óssea e qual é a consequência de sua deficiência?",
-      "Como o estrogênio influencia a saúde cardiovascular e por que sua queda aumenta o risco de doenças cardíacas?"
+      "1-Por que a queda dos níveis de estrogênio pode favorecer infecções urinárias recorrentes em mulheres na pós-menopausa?",
+      "2-Quais alterações são causadas na visão pela queda dos níveis de estrogênio na menopausa?",
+      "3-De que forma o estrogênio atua na manutenção da densidade óssea e qual é a consequência de sua deficiência?",
+      "4-Como o estrogênio influencia a saúde cardiovascular e por que sua queda aumenta o risco de doenças cardíacas?"
     ];
     
     const luckyPhrases = [
@@ -250,7 +250,7 @@
       if (bombs.includes(index)) {
         cell.classList.add("bomb");
         cell.textContent = "💣";
-        showQuestion("Explodiu! Você encontrou uma bomba! Repasse a vez para um amigo.");
+        showQuestion("Explodiu! Você encontrou uma bomba! Escolha um amigo para repassar a vez");
         gameActive = false;
         return;
       }

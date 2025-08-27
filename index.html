@@ -204,13 +204,23 @@
     let bombs = [];
     let gameActive = false;
     let isFirstMove = true;
+    
+    // Lista para rastrear todas as perguntas já feitas desde o carregamento da página
+    let askedQuestions = [];
 
     function initGame() {
       const boardDiv = document.getElementById("board");
       boardDiv.innerHTML = "";
       boardDiv.style.gridTemplateColumns = `repeat(${boardSize}, 50px)`;
       board = [];
-      availableQuestions = [...allQuestions];
+      
+      // Se todas as perguntas já foram feitas, reseta a lista
+      const unaskedQuestions = allQuestions.filter(q => !askedQuestions.includes(q));
+      if (unaskedQuestions.length === 0) {
+          askedQuestions = [];
+      }
+      
+      availableQuestions = allQuestions.filter(q => !askedQuestions.includes(q));
       availableLuckyPhrases = [...luckyPhrases];
       gameActive = true;
       isFirstMove = true;
@@ -265,6 +275,10 @@
               phraseToShow = "Todas as perguntas já foram feitas!";
               gameActive = false;
           }
+      }
+
+      if (phraseToShow && allQuestions.includes(phraseToShow)) {
+          askedQuestions.push(phraseToShow);
       }
 
       cell.textContent = "?";

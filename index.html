@@ -2,38 +2,153 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz - Jogo do Campo Minado</title>
+  <title>Efeitos do estrogênio no corpo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 0; }
-    header { background: #4a148c; color: white; padding: 15px; width: 100%; text-align: center; }
-    #board { display: grid; margin-top: 20px; }
-    .cell { width: 40px; height: 40px; border: 1px solid #888; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; background: #ddd; }
-    .cell.revealed { background: #fff; cursor: default; }
-    #questionBox { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 2px solid #444; padding: 20px; border-radius: 10px; max-width: 400px; z-index: 1000; }
-    #questionBox button { margin-top: 15px; }
-    .bomb { background: red !important; color: white; font-size: 20px; }
-    footer { margin-top: 20px; font-size: 14px; color: #444; }
+    /* Mantém as melhorias visuais e responsividade */
+    :root {
+      --cor-principal: #4a148c;
+      --cor-bomba: #e53935;
+      --cor-celula: #ddd;
+      --cor-celula-revelada: #fff;
+      --cor-texto: #222;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      background: var(--cor-principal);
+      color: white;
+      padding: 20px 10px;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    #board {
+      display: grid;
+      gap: 4px;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 40px; height: 40px;
+      border: 1px solid #888;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+      background: var(--cor-celula);
+      color: var(--cor-texto);
+      border-radius: 5px;
+      user-select: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .cell.revealed {
+      background: var(--cor-celula-revelada);
+      cursor: default;
+    }
+    .bomb {
+      background: var(--cor-bomba) !important;
+      color: white !important;
+      font-size: 22px;
+      border: 2px solid #b71c1c;
+      animation: bombAnim 0.6s;
+    }
+    @keyframes bombAnim {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    #questionBox {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      border: 2px solid #444;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.24);
+      max-width: 90vw;
+      z-index: 1000;
+      text-align: center;
+    }
+    #questionBox button {
+      margin-top: 15px;
+      padding: 8px 18px;
+      background: var(--cor-principal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #questionBox button:hover {
+      background: #6a1b9a;
+    }
+    .stats {
+      margin-top: 10px;
+      font-size: 16px;
+      color: var(--cor-texto);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    #newRoundBtn {
+      display: none;
+      margin-top: 15px;
+      padding: 10px 22px;
+      background: var(--cor-principal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    footer {
+      margin-top: 25px;
+      font-size: 14px;
+      color: #444;
+      text-align: center;
+      padding-bottom: 12px;
+    }
+    @media (max-width: 600px) {
+      .cell { width: 30px; height: 30px; font-size: 14px;}
+      #board { gap: 2px; }
+      header { font-size: 15px; padding: 12px 2px;}
+    }
   </style>
 </head>
 <body>
   <header>
-    <h2>Campo Minado Quiz - Menopausa</h2>
+    <h2>Efeitos do estrogênio no corpo</h2>
   </header>
-
-  <button onclick="initGame()">Novo Jogo</button>
-  <div id="board"></div>
-
-  <div id="questionBox">
+  <div class="stats" id="statsBox">
+    <span id="questionsUsed"></span>
+  </div>
+  <button id="newRoundBtn" onclick="startNewRound()">Nova Rodada</button>
+  <div id="board" role="grid" aria-label="Tabuleiro do Campo Minado"></div>
+  <div id="questionBox" role="dialog" aria-modal="true" aria-labelledby="questionText">
     <p id="questionText"></p>
     <button onclick="closeQuestion()">Fechar</button>
   </div>
-
-  <footer>
+ <footer>
     <p>Compartilhe este link para jogar: <span id="link"></span></p>
-  </footer>
-
+    <p style="margin-top:10px;color:#666;">Este site foi criado por um aluno da Faculdade FAMEAC para fins didáticos na disciplina "Saúde da Mulher".</p>
+</footer>
   <script>
+    // Frases e perguntas
     const allPhrases = [
       "Escolha alguém para responder: Por que a queda dos níveis de estrogênio pode favorecer infecções urinárias recorrentes em mulheres na pós-menopausa?",
       "Deu sorte! Sem perguntas por aqui",
@@ -44,57 +159,92 @@
       "Como o estrogênio influencia a saúde cardiovascular e por que sua queda aumenta o risco de doenças cardíacas?"
     ];
 
-    const boardSize = 5;
-    let board = [];
+    // Configuração inicial
+    const boardSize = 7; // 7 frases = 7 células
     let availablePhrases = [];
-    let bombs = [];
+    let revealedIndexes = [];
+    let bombIndex = null;
+    let gameActive = true;
 
-    function initGame() {
-      const boardDiv = document.getElementById("board");
-      boardDiv.innerHTML = "";
-      boardDiv.style.gridTemplateColumns = `repeat(${boardSize}, 40px)`;
-      board = [];
-      availablePhrases = [...allPhrases];
-
-      bombs = [];
-      while (bombs.length < 5) {
-        let b = Math.floor(Math.random() * (boardSize * boardSize));
-        if (!bombs.includes(b)) bombs.push(b);
-      }
-
-      for (let i = 0; i < boardSize * boardSize; i++) {
-        const cell = document.createElement("div");
-        cell.classList.add("cell");
-        cell.dataset.index = i;
-        cell.onclick = () => revealCell(cell);
-        board.push(cell);
-        boardDiv.appendChild(cell);
-      }
+    function updateStats() {
+      document.getElementById("questionsUsed").innerText =
+        `Perguntas usadas: ${revealedIndexes.length}/${allPhrases.length}`;
     }
 
-    function revealCell(cell) {
-      if (cell.classList.contains("revealed")) return;
-      cell.classList.add("revealed");
+    // Inicializa rodada
+    function initGame(round = 1) {
+      const boardDiv = document.getElementById("board");
+      boardDiv.innerHTML = "";
+      boardDiv.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+      availablePhrases = getAvailablePhrases();
+      revealedIndexes = [];
+      bombIndex = Math.floor(Math.random() * availablePhrases.length); // bomba aleatória
+      gameActive = true;
+      document.getElementById("newRoundBtn").style.display = "none";
+      updateStats();
 
+      // Cria células
+      for (let i = 0; i < availablePhrases.length; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.setAttribute("role", "gridcell");
+        cell.setAttribute("tabindex", "0");
+        cell.setAttribute("aria-label", `Celula ${i + 1}`);
+        cell.dataset.index = i;
+        cell.onclick = () => revealCell(cell);
+        cell.onkeydown = function(e) {
+          if (e.key === "Enter" || e.key === " ") revealCell(cell);
+        }
+        boardDiv.appendChild(cell);
+      }
+      // Revela automaticamente as perguntas até achar a bomba
+      autoRevealCells();
+    }
+
+    // Função para mostrar frases ainda não usadas
+    function getAvailablePhrases() {
+      const used = JSON.parse(localStorage.getItem("usedIndexes") || "[]");
+      return allPhrases.filter((_, idx) => !used.includes(idx));
+    }
+
+    // Revela células automaticamente até bomba
+    function autoRevealCells() {
+      const cells = document.querySelectorAll(".cell");
+      let i = 0;
+      function nextCell() {
+        if (!gameActive || i >= cells.length) return;
+        revealCell(cells[i], true);
+        if (gameActive) { // só segue se não achou bomba
+          i++;
+          setTimeout(nextCell, 800);
+        }
+      }
+      setTimeout(nextCell, 800);
+    }
+
+    function revealCell(cell, auto = false) {
+      if (cell.classList.contains("revealed") || !gameActive) return;
+      cell.classList.add("revealed");
       const index = parseInt(cell.dataset.index);
-      if (bombs.includes(index)) {
+
+      revealedIndexes.push(index);
+      updateStats();
+
+      // Se for bomba
+      if (index === bombIndex) {
         cell.classList.add("bomb");
         cell.textContent = "💣";
-        showQuestion("Explodiu! Você encontrou uma bomba!");
+        showQuestion("Repasse a vez para um amigo");
+        gameActive = false;
+        document.getElementById("newRoundBtn").style.display = "inline-block";
+        saveUsedIndexes();
         return;
       }
 
-      if (availablePhrases.length === 0) {
-        cell.textContent = "?";
-        showQuestion("Todas as perguntas já foram usadas!");
-        return;
-      }
-
-      const i = Math.floor(Math.random() * availablePhrases.length);
-      const phrase = availablePhrases.splice(i, 1)[0];
-
+      // Mostra a frase da célula
       cell.textContent = "?";
-      showQuestion(phrase);
+      showQuestion(availablePhrases[index]);
+      if (!auto) saveUsedIndexes();
     }
 
     function showQuestion(text) {
@@ -106,8 +256,29 @@
       document.getElementById("questionBox").style.display = "none";
     }
 
+    function saveUsedIndexes() {
+      // Marca as perguntas já feitas
+      const used = JSON.parse(localStorage.getItem("usedIndexes") || "[]");
+      const currentIndexes = availablePhrases.map((_, idx) => idx);
+      for (const idx of revealedIndexes) {
+        const phraseIdx = allPhrases.indexOf(availablePhrases[idx]);
+        if (phraseIdx !== -1 && !used.includes(phraseIdx)) used.push(phraseIdx);
+      }
+      localStorage.setItem("usedIndexes", JSON.stringify(used));
+    }
+
+    function startNewRound() {
+      // Se acabou todas as perguntas, reinicia o ciclo
+      if (getAvailablePhrases().length === 0) {
+        localStorage.removeItem("usedIndexes");
+      }
+      initGame();
+      closeQuestion();
+    }
+
     document.getElementById("link").innerText = window.location.href;
 
+    // Inicia primeira rodada
     initGame();
   </script>
 </body>
